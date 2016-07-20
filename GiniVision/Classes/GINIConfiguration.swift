@@ -43,7 +43,7 @@ import Foundation
  
      - note: Screen API only.
      */
-    public var backgroundColor = UIColor.blackColor()
+    public var backgroundColor = UIColor.black()
     
     /**
      Sets the tint color of the navigation bar in all screens of the Gini Vision Library to the globally specified color or to a default color.
@@ -64,7 +64,7 @@ import Foundation
      
      - note: Screen API only.
      */
-    public var navigationBarItemFont = UIBarButtonItem.appearance().titleTextAttributesForState(.Normal)?[NSFontAttributeName] as? UIFont ?? UIFontPreferred(.Regular, andSize: 16)
+    public var navigationBarItemFont = UIBarButtonItem.appearance().titleTextAttributes(for: UIControlState())?[NSFontAttributeName] as? UIFont ?? UIFontPreferred(.regular, andSize: 16)
     
     /**
      Sets the title color in the navigation bar in all screens of the Gini Vision Library to the globally specified color or to a default color.
@@ -78,32 +78,32 @@ import Foundation
      
      - note: Screen API only.
      */
-    public var navigationBarTitleFont = UINavigationBar.appearance().titleTextAttributes?[NSFontAttributeName] as? UIFont ?? UIFontPreferred(.Light, andSize: 16)
+    public var navigationBarTitleFont = UINavigationBar.appearance().titleTextAttributes?[NSFontAttributeName] as? UIFont ?? UIFontPreferred(.light, andSize: 16)
     
     /** 
      Sets the background color of an informal notice. Notices are small pieces of information appearing underneath the navigation bar.
      */
-    public var noticeInformationBackgroundColor = UIColor.blackColor()
+    public var noticeInformationBackgroundColor = UIColor.black()
     
     /**
      Sets the text color of an informal notice. Notices are small pieces of information appearing underneath the navigation bar.
      */
-    public var noticeInformationTextColor = UIColor.whiteColor()
+    public var noticeInformationTextColor = UIColor.white()
     
     /**
      Sets the background color of an error notice. Notices are small pieces of information appearing underneath the navigation bar.
      */
-    public var noticeErrorBackgroundColor = UIColor.redColor()
+    public var noticeErrorBackgroundColor = UIColor.red()
     
     /**
      Sets the text color of an error notice. Notices are small pieces of information appearing underneath the navigation bar.
      */
-    public var noticeErrorTextColor = UIColor.whiteColor()
+    public var noticeErrorTextColor = UIColor.white()
     
     /** 
      Sets the font of all notices. Notices are small pieces of information appearing underneath the navigation bar.
      */
-    public var noticeFont = UIFontPreferred(.Regular, andSize: 12)
+    public var noticeFont = UIFontPreferred(.regular, andSize: 12)
     
     
     
@@ -139,12 +139,12 @@ import Foundation
     /**
      Sets the font of the descriptional text when camera access was denied.
      */
-    public var cameraNotAuthorizedTextFont = UIFontPreferred(.Thin, andSize: 20)
+    public var cameraNotAuthorizedTextFont = UIFontPreferred(.thin, andSize: 20)
     
     /**
      Sets the text color of the descriptional text when camera access was denied.
      */
-    public var cameraNotAuthorizedTextColor = UIColor.whiteColor()
+    public var cameraNotAuthorizedTextColor = UIColor.white()
     
     /**
      Sets the button title when camera access was denied, clicking the button will open the settings application.
@@ -154,12 +154,12 @@ import Foundation
     /**
      Sets the font of the button title when camera access was denied.
      */
-    public var cameraNotAuthorizedButtonFont = UIFontPreferred(.Regular, andSize: 20)
+    public var cameraNotAuthorizedButtonFont = UIFontPreferred(.regular, andSize: 20)
     
     /**
      Sets the text color of the button title when camera access was denied.
      */
-    public var cameraNotAuthorizedButtonTitleColor = UIColor.whiteColor()
+    public var cameraNotAuthorizedButtonTitleColor = UIColor.white()
     
     
     
@@ -181,12 +181,12 @@ import Foundation
     /**
      Sets the color of the page controller's page indicator items.
      */
-    public var onboardingPageIndicatorColor = UIColor.whiteColor().colorWithAlphaComponent(0.2)
+    public var onboardingPageIndicatorColor = UIColor.white().withAlphaComponent(0.2)
     
     /**
      Sets the color of the page controller's current page indicator item.
      */
-    public var onboardingCurrentPageIndicatorColor = UIColor.whiteColor()
+    public var onboardingCurrentPageIndicatorColor = UIColor.white()
     
     /**
      Indicates whether the onboarding screen should be presented at each start of the Gini Vision Library.
@@ -221,12 +221,12 @@ import Foundation
     /**
      Sets the font of the text for all onboarding pages.
      */
-    public var onboardingTextFont = UIFontPreferred(.Thin, andSize: 28)
+    public var onboardingTextFont = UIFontPreferred(.thin, andSize: 28)
     
     /**
      Sets the color ot the text for all onboarding pages.
      */
-    public var onboardingTextColor = UIColor.whiteColor()
+    public var onboardingTextColor = UIColor.white()
     
     /**
      All onboarding pages which will be presented in a horizontal scroll view to the user. By default the Gini Vision Library comes with three pages advising the user to keep the document flat, hold the device parallel and capture the whole document.
@@ -298,7 +298,7 @@ import Foundation
      
      - note: Background will have a 20% transparency, to have enough space for the document image on smaller devices.
      */
-    public var reviewBottomViewBackgroundColor = UIColor.blackColor()
+    public var reviewBottomViewBackgroundColor = UIColor.black()
     
     /**
      Sets the text appearing at the bottom of the review screen which should encourage the user to check sharpness by double-tapping the image.
@@ -308,12 +308,12 @@ import Foundation
     /**
      Sets the font of the text appearing at the bottom of the review screen.
      */
-    public var reviewTextBottomFont = UIFontPreferred(.Thin, andSize: 12)
+    public var reviewTextBottomFont = UIFontPreferred(.thin, andSize: 12)
     
     /**
      Sets the color of the text appearing at the bottom of the review screen.
      */
-    public var reviewTextBottomColor = UIColor.whiteColor()
+    public var reviewTextBottomColor = UIColor.white()
     
     
     
@@ -334,7 +334,7 @@ import Foundation
     /**
      Sets the color of the loading indicator on the analysis screen to the specified color.
      */
-    public var analysisLoadingIndicatorColor = UIColor.whiteColor()
+    public var analysisLoadingIndicatorColor = UIColor.white()
     
     
     
@@ -356,7 +356,7 @@ internal struct Colors {
         
     }
     
-    private static func UIColorHex(hex: UInt) -> UIColor {
+    private static func UIColorHex(_ hex: UInt) -> UIColor {
         return UIColor(
             red: CGFloat((hex & 0xFF0000) >> 16) / 255.0,
             green: CGFloat((hex & 0x00FF00) >> 8) / 255.0,

@@ -14,7 +14,7 @@ import AVFoundation
 
  - note: Component API only.
  */
-public typealias GINICameraSuccessBlock = (imageData: NSData) -> ()
+public typealias GINICameraSuccessBlock = (imageData: Data) -> ()
 
 /**
  Block which will be executed if an error occurs on the camera screen. It contains a camera specific error.
@@ -52,7 +52,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
 @objc public final class GINICameraViewController: UIViewController {
     
     private enum CameraState {
-        case Valid, NotValid
+        case valid, notValid
     }
     
     // User interface
@@ -65,7 +65,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
     
     // Properties
     private var camera: GINICamera?
-    private var cameraState = CameraState.NotValid
+    private var cameraState = CameraState.notValid
     
     // Images
     private var defaultImage: UIImage? {
@@ -111,10 +111,10 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
             camera = try GINICamera()
         } catch let error as GINICameraError {
             switch error {
-            case .NotAuthorizedToUseDevice:
+            case .notAuthorizedToUseDevice:
                 addNotAuthorizedView()
             default:
-                if GINIConfiguration.DEBUG { cameraState = .Valid; addDefaultImage() }
+                if GINIConfiguration.DEBUG { cameraState = .valid; addDefaultImage() }
             }
             failure(error: error)
         } catch _ {
@@ -123,23 +123,23 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
         
         // Configure preview view
         if let validCamera = camera {
-            cameraState = .Valid
+            cameraState = .valid
             previewView.session = validCamera.session
             (previewView.layer as! AVCaptureVideoPreviewLayer).videoGravity = AVLayerVideoGravityResizeAspectFill
             let tapGesture = UITapGestureRecognizer(target: self, action: #selector(focusAndExposeTap))
             previewView.addGestureRecognizer(tapGesture)
-            NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(subjectAreaDidChange), name: AVCaptureDeviceSubjectAreaDidChangeNotification, object: camera?.videoDeviceInput?.device)
+            NotificationCenter.default.addObserver(self, selector: #selector(subjectAreaDidChange), name: NSNotification.Name.AVCaptureDeviceSubjectAreaDidChange, object: camera?.videoDeviceInput?.device)
         }
         
         
         // Configure camera overlay
         cameraOverlay.image = cameraOverlayImage
-        cameraOverlay.contentMode = .ScaleAspectFit
+        cameraOverlay.contentMode = .scaleAspectFit
         
         // Configure capture button
-        captureButton.setImage(captureButtonNormalImage, forState: .Normal)
-        captureButton.setImage(captureButtonActiveImage, forState: .Highlighted)
-        captureButton.addTarget(self, action: #selector(captureImage), forControlEvents: .TouchUpInside)
+        captureButton.setImage(captureButtonNormalImage, for: UIControlState())
+        captureButton.setImage(captureButtonActiveImage, for: .highlighted)
+        captureButton.addTarget(self, action: #selector(captureImage), for: .touchUpInside)
         
         // Configure view hierachy
         view.addSubview(previewView)
@@ -161,7 +161,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
     }
     
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
     
     /**
@@ -169,7 +169,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
      
      - parameter animated: If `true`, the view is added to the window using an animation.
      */
-    public override func viewWillAppear(animated: Bool) {
+    public override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
         camera?.start()
@@ -180,7 +180,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
      
      - parameter animated: If `true`, the disappearance of the view is animated.
      */
-    public override func viewWillDisappear(animated: Bool) {
+    public override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         
         camera?.stop()
@@ -191,7 +191,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
      Show the capture button. Should be called when onboarding is dismissed.
      */
     public func showCaptureButton() {
-        guard cameraState == .Valid else { return }
+        guard cameraState == .valid else { return }
         controlsView.alpha = 1
     }
     
@@ -206,7 +206,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
      Show the camera overlay. Should be called when onboarding is dismissed.
      */
     public func showCameraOverlay() {
-        guard cameraState == .Valid else { return }
+        guard cameraState == .valid else { return }
         cameraOverlay.alpha = 1
     }
     
@@ -218,7 +218,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
     }
     
     // MARK: Image capture
-    @objc private func captureImage(sender: AnyObject) {
+    @objc private func captureImage(_ sender: AnyObject) {
         guard let camera = camera else {
             if GINIConfiguration.DEBUG {
                 // Retrieve image from default image view to make sure image was set and therefor the correct states were checked before.
@@ -233,7 +233,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
             do {
                 let imageData = try inner()
                 // Call success block
-                self.successBlock?(imageData: imageData)
+                self.successBlock?(imageData: imageData as Data)
             } catch let error as GINICameraError {
                 self.errorBlock?(error: error)
             } catch _ {
@@ -246,17 +246,17 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
     // MARK: Focus handling
     private typealias FocusIndicator = UIImageView
     
-    @objc private func focusAndExposeTap(sender: UITapGestureRecognizer) {
-        let devicePoint = (previewView.layer as! AVCaptureVideoPreviewLayer).captureDevicePointOfInterestForPoint(sender.locationInView(sender.view))
-        camera?.focusWithMode(.AutoFocus, exposeWithMode: .AutoExpose, atDevicePoint: devicePoint, monitorSubjectAreaChange: true)
-        let imageView = createFocusIndicator(withImage: cameraFocusSmall, atPoint: (previewView.layer as! AVCaptureVideoPreviewLayer).pointForCaptureDevicePointOfInterest(devicePoint))
+    @objc private func focusAndExposeTap(_ sender: UITapGestureRecognizer) {
+        let devicePoint = (previewView.layer as! AVCaptureVideoPreviewLayer).captureDevicePointOfInterest(for: sender.location(in: sender.view))
+        camera?.focusWithMode(.autoFocus, exposeWithMode: .autoExpose, atDevicePoint: devicePoint, monitorSubjectAreaChange: true)
+        let imageView = createFocusIndicator(withImage: cameraFocusSmall, atPoint: (previewView.layer as! AVCaptureVideoPreviewLayer).pointForCaptureDevicePoint(ofInterest: devicePoint))
         showFocusIndicator(imageView)
     }
     
-    @objc private func subjectAreaDidChange(notification: NSNotification) {
-        let devicePoint = CGPointMake(0.5, 0.5)
-        camera?.focusWithMode(.ContinuousAutoFocus, exposeWithMode: .ContinuousAutoExposure, atDevicePoint: devicePoint, monitorSubjectAreaChange: false)
-        let imageView = createFocusIndicator(withImage: cameraFocusLarge, atPoint: (previewView.layer as! AVCaptureVideoPreviewLayer).pointForCaptureDevicePointOfInterest(devicePoint))
+    @objc private func subjectAreaDidChange(_ notification: Notification) {
+        let devicePoint = CGPoint(x: 0.5, y: 0.5)
+        camera?.focusWithMode(.continuousAutoFocus, exposeWithMode: .continuousAutoExposure, atDevicePoint: devicePoint, monitorSubjectAreaChange: false)
+        let imageView = createFocusIndicator(withImage: cameraFocusLarge, atPoint: (previewView.layer as! AVCaptureVideoPreviewLayer).pointForCaptureDevicePoint(ofInterest: devicePoint))
         showFocusIndicator(imageView)
     }
     
@@ -267,8 +267,8 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
         return imageView
     }
     
-    private func showFocusIndicator(imageView: FocusIndicator?) {
-        guard cameraState == .Valid else { return }
+    private func showFocusIndicator(_ imageView: FocusIndicator?) {
+        guard cameraState == .valid else { return }
         guard let imageView = imageView else { return }
         for subView in self.previewView.subviews {
             if let focusIndicator = subView as? FocusIndicator {
@@ -276,7 +276,7 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
             }
         }
         self.previewView.addSubview(imageView)
-        UIView.animateWithDuration(1.5,
+        UIView.animate(withDuration: 1.5,
                                    animations: {
                                     imageView.alpha = 0.0
             },
@@ -291,34 +291,34 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
         
         // Preview view
         previewView.translatesAutoresizingMaskIntoConstraints = false
-        UIViewController.addActiveConstraint(item: previewView, attribute: .Top, relatedBy: .Equal, toItem: superview, attribute: .Top, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: previewView, attribute: .Bottom, relatedBy: .GreaterThanOrEqual, toItem: superview, attribute: .Bottom, multiplier: 1, constant: 0, priority: 750)
-        UIViewController.addActiveConstraint(item: previewView, attribute: .Width, relatedBy: .Equal, toItem: previewView, attribute: .Height, multiplier: 3/4, constant: 0)
-        UIViewController.addActiveConstraint(item: previewView, attribute: .Width, relatedBy: .Equal, toItem: superview, attribute: .Width, multiplier: 1, constant: 0, priority: 750)
-        UIViewController.addActiveConstraint(item: previewView, attribute: .Width, relatedBy: .LessThanOrEqual, toItem: superview, attribute: .Width, multiplier: 1, constant: 0, priority: 999)
-        UIViewController.addActiveConstraint(item: previewView, attribute: .CenterX, relatedBy: .Equal, toItem: superview, attribute: .CenterX, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: previewView, attribute: .top, relatedBy: .equal, toItem: superview, attribute: .top, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: previewView, attribute: .bottom, relatedBy: .greaterThanOrEqual, toItem: superview, attribute: .bottom, multiplier: 1, constant: 0, priority: 750)
+        UIViewController.addActiveConstraint(item: previewView, attribute: .width, relatedBy: .equal, toItem: previewView, attribute: .height, multiplier: 3/4, constant: 0)
+        UIViewController.addActiveConstraint(item: previewView, attribute: .width, relatedBy: .equal, toItem: superview, attribute: .width, multiplier: 1, constant: 0, priority: 750)
+        UIViewController.addActiveConstraint(item: previewView, attribute: .width, relatedBy: .lessThanOrEqual, toItem: superview, attribute: .width, multiplier: 1, constant: 0, priority: 999)
+        UIViewController.addActiveConstraint(item: previewView, attribute: .centerX, relatedBy: .equal, toItem: superview, attribute: .centerX, multiplier: 1, constant: 0)
         
         // Camera overlay view
         cameraOverlay.translatesAutoresizingMaskIntoConstraints = false
-        UIViewController.addActiveConstraint(item: cameraOverlay, attribute: .Top, relatedBy: .Equal, toItem: previewView, attribute: .Top, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: cameraOverlay, attribute: .Trailing, relatedBy: .Equal, toItem: previewView, attribute: .Trailing, multiplier: 1, constant: -23)
-        UIViewController.addActiveConstraint(item: cameraOverlay, attribute: .Bottom, relatedBy: .Equal, toItem: previewView, attribute: .Bottom, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: cameraOverlay, attribute: .Leading, relatedBy: .Equal, toItem: previewView, attribute: .Leading, multiplier: 1, constant: 23)
+        UIViewController.addActiveConstraint(item: cameraOverlay, attribute: .top, relatedBy: .equal, toItem: previewView, attribute: .top, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: cameraOverlay, attribute: .trailing, relatedBy: .equal, toItem: previewView, attribute: .trailing, multiplier: 1, constant: -23)
+        UIViewController.addActiveConstraint(item: cameraOverlay, attribute: .bottom, relatedBy: .equal, toItem: previewView, attribute: .bottom, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: cameraOverlay, attribute: .leading, relatedBy: .equal, toItem: previewView, attribute: .leading, multiplier: 1, constant: 23)
         
         // Controls view
         controlsView.translatesAutoresizingMaskIntoConstraints = false
-        UIViewController.addActiveConstraint(item: controlsView, attribute: .Top, relatedBy: .Equal, toItem: previewView, attribute: .Bottom, multiplier: 1, constant: 0, priority: 750)
-        UIViewController.addActiveConstraint(item: controlsView, attribute: .Trailing, relatedBy: .Equal, toItem: superview, attribute: .Trailing, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: controlsView, attribute: .Bottom, relatedBy: .Equal, toItem: superview, attribute: .Bottom, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: controlsView, attribute: .Leading, relatedBy: .Equal, toItem: superview, attribute: .Leading, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: controlsView, attribute: .Height, relatedBy: .GreaterThanOrEqual, toItem: captureButton, attribute: .Height, multiplier: 1.1, constant: 0)
+        UIViewController.addActiveConstraint(item: controlsView, attribute: .top, relatedBy: .equal, toItem: previewView, attribute: .bottom, multiplier: 1, constant: 0, priority: 750)
+        UIViewController.addActiveConstraint(item: controlsView, attribute: .trailing, relatedBy: .equal, toItem: superview, attribute: .trailing, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: controlsView, attribute: .bottom, relatedBy: .equal, toItem: superview, attribute: .bottom, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: controlsView, attribute: .leading, relatedBy: .equal, toItem: superview, attribute: .leading, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: controlsView, attribute: .height, relatedBy: .greaterThanOrEqual, toItem: captureButton, attribute: .height, multiplier: 1.1, constant: 0)
         
         // Capture button
         captureButton.translatesAutoresizingMaskIntoConstraints = false
-        UIViewController.addActiveConstraint(item: captureButton, attribute: .Width, relatedBy: .Equal, toItem: nil, attribute: .Width, multiplier: 1, constant: 66)
-        UIViewController.addActiveConstraint(item: captureButton, attribute: .Height, relatedBy: .Equal, toItem: nil, attribute: .Height, multiplier: 1, constant: 66)
-        UIViewController.addActiveConstraint(item: captureButton, attribute: .CenterX, relatedBy: .Equal, toItem: controlsView, attribute: .CenterX, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: captureButton, attribute: .CenterY, relatedBy: .Equal, toItem: controlsView, attribute: .CenterY, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: captureButton, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .width, multiplier: 1, constant: 66)
+        UIViewController.addActiveConstraint(item: captureButton, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .height, multiplier: 1, constant: 66)
+        UIViewController.addActiveConstraint(item: captureButton, attribute: .centerX, relatedBy: .equal, toItem: controlsView, attribute: .centerX, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: captureButton, attribute: .centerY, relatedBy: .equal, toItem: controlsView, attribute: .centerY, multiplier: 1, constant: 0)
     }
     
     private func addNotAuthorizedView() {
@@ -328,10 +328,10 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
         previewView.addSubview(view)
         
         view.translatesAutoresizingMaskIntoConstraints = false
-        UIViewController.addActiveConstraint(item: view, attribute: .Width, relatedBy: .Equal, toItem: previewView, attribute: .Width, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: view, attribute: .Height, relatedBy: .Equal, toItem: previewView, attribute: .Height, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: view, attribute: .CenterX, relatedBy: .Equal, toItem: previewView, attribute: .CenterX, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: view, attribute: .CenterY, relatedBy: .Equal, toItem: previewView, attribute: .CenterY, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: view, attribute: .width, relatedBy: .equal, toItem: previewView, attribute: .width, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: view, attribute: .height, relatedBy: .equal, toItem: previewView, attribute: .height, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: view, attribute: .centerX, relatedBy: .equal, toItem: previewView, attribute: .centerX, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: view, attribute: .centerY, relatedBy: .equal, toItem: previewView, attribute: .centerY, multiplier: 1, constant: 0)
         
         // Hide camera UI
         hideCameraOverlay()
@@ -343,14 +343,14 @@ public typealias GINICameraErrorBlock = (error: GINICameraError) -> ()
         defaultImageView = UIImageView(image: defaultImage)
         guard let defaultImageView = defaultImageView else { return }
         
-        defaultImageView.contentMode = .ScaleAspectFit
+        defaultImageView.contentMode = .scaleAspectFit
         previewView.addSubview(defaultImageView)
         
         defaultImageView.translatesAutoresizingMaskIntoConstraints = false
-        UIViewController.addActiveConstraint(item: defaultImageView, attribute: .Width, relatedBy: .Equal, toItem: previewView, attribute: .Width, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: defaultImageView, attribute: .Height, relatedBy: .Equal, toItem: previewView, attribute: .Height, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: defaultImageView, attribute: .CenterX, relatedBy: .Equal, toItem: previewView, attribute: .CenterX, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: defaultImageView, attribute: .CenterY, relatedBy: .Equal, toItem: previewView, attribute: .CenterY, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: defaultImageView, attribute: .width, relatedBy: .equal, toItem: previewView, attribute: .width, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: defaultImageView, attribute: .height, relatedBy: .equal, toItem: previewView, attribute: .height, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: defaultImageView, attribute: .centerX, relatedBy: .equal, toItem: previewView, attribute: .centerX, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: defaultImageView, attribute: .centerY, relatedBy: .equal, toItem: previewView, attribute: .centerY, multiplier: 1, constant: 0)
     }
     
 }

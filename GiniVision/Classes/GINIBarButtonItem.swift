@@ -17,15 +17,15 @@ internal class GINIBarButtonItem: UIBarButtonItem {
         self.action = action
         
         // Prioritize title over image
-        if let s = title where !s.isEmpty {
+        if let s = title, !s.isEmpty {
             self.title = title
         } else {
             self.image = image
         }
         
-        var attributes = titleTextAttributesForState(.Normal) ?? [String : AnyObject]()
+        var attributes = titleTextAttributes(for: UIControlState()) ?? [String : AnyObject]()
         attributes[NSFontAttributeName] = GINIConfiguration.sharedConfiguration.navigationBarItemFont
-        setTitleTextAttributes(attributes, forState: .Normal)
+        setTitleTextAttributes(attributes, for: UIControlState())
     }
     
     required init?(coder aDecoder: NSCoder) {

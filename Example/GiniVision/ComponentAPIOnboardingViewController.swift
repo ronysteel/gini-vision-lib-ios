@@ -26,16 +26,16 @@ class ComponentAPIOnboardingViewController: UIViewController {
     }
     
     // Scrolls the onboarding view controller to the next page
-    @IBAction func nextPage(sender: AnyObject) {
+    @IBAction func nextPage(_ sender: AnyObject) {
         (contentController as? GINIOnboardingViewController)?.scrollToNextPage(true)
     }
     
     // Displays the content controller inside the container view
-    func displayContent(controller: UIViewController) {
+    func displayContent(_ controller: UIViewController) {
         self.addChildViewController(controller)
         controller.view.frame = self.containerView.bounds
         self.containerView.addSubview(controller.view)
-        controller.didMoveToParentViewController(self)
+        controller.didMove(toParentViewController: self)
     }
     
 }

@@ -16,7 +16,7 @@ class ComponentAPICameraViewController: UIViewController {
     var contentController = UIViewController()
     
     // Output
-    var imageData: NSData?
+    var imageData: Data?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,8 +30,8 @@ class ComponentAPICameraViewController: UIViewController {
         contentController = GINICameraViewController(success:
             { imageData in
                 self.imageData = imageData
-                dispatch_async(dispatch_get_main_queue(), { 
-                    self.performSegueWithIdentifier("giniShowReview", sender: self)
+                DispatchQueue.main.async(execute: { () -> Void in
+                    self.performSegue(withIdentifier: "giniShowReview", sender: self)
                 })
             }, failure: { error in
                 print("Component API camera view controller received error:\n\(error)")
@@ -41,18 +41,18 @@ class ComponentAPICameraViewController: UIViewController {
         displayContent(contentController)
     }
     
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         
-        navigationController?.navigationBarHidden = true
+        navigationController?.isNavigationBarHidden = true
     }
     
     // Go back to the API selection view controller
-    @IBAction func back(sender: AnyObject) {
-        dismissViewControllerAnimated(true, completion: nil)
+    @IBAction func back(_ sender: AnyObject) {
+        dismiss(animated: true, completion: nil)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "giniShowReview" {
             if let imageData = imageData,
                let vc = segue.destinationViewController as? ComponentAPIReviewViewController {
@@ -63,11 +63,11 @@ class ComponentAPICameraViewController: UIViewController {
     }
     
     // Displays the content controller inside the container view
-    func displayContent(controller: UIViewController) {
+    func displayContent(_ controller: UIViewController) {
         self.addChildViewController(controller)
         controller.view.frame = self.containerView.bounds
         self.containerView.addSubview(controller.view)
-        controller.didMoveToParentViewController(self)
+        controller.didMove(toParentViewController: self)
     }
 
 }

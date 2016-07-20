@@ -53,17 +53,17 @@ import UIKit
      
      - returns: A view controller instance giving the user a nice user interface while waiting for the analysis results.
      */
-    public init(_ imageData: NSData) {
+    public init(_ imageData: Data) {
         super.init(nibName: nil, bundle: nil)
         
         // Configure image view
         imageView.image = UIImage(data: imageData)
-        imageView.contentMode = .ScaleAspectFit
+        imageView.contentMode = .scaleAspectFit
         
         // Configure loading indicator view
         loadingIndicatorView.color = GINIConfiguration.sharedConfiguration.analysisLoadingIndicatorColor
         loadingIndicatorView.hidesWhenStopped = true
-        loadingIndicatorView.activityIndicatorViewStyle = .WhiteLarge
+        loadingIndicatorView.activityIndicatorViewStyle = .whiteLarge
         
         // Configure view hierachy
         view.addSubview(imageView)
@@ -105,18 +105,18 @@ import UIKit
 
         // Image view
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        UIViewController.addActiveConstraint(item: imageView, attribute: .Top, relatedBy: .Equal, toItem: superview, attribute: .Top, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: imageView, attribute: .Trailing, relatedBy: .Equal, toItem: superview, attribute: .Trailing, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: imageView, attribute: .Bottom, relatedBy: .Equal, toItem: superview, attribute: .Bottom, multiplier: 1, constant: 0, priority: 750)
-        UIViewController.addActiveConstraint(item: imageView, attribute: .Leading, relatedBy: .Equal, toItem: superview, attribute: .Leading, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: imageView, attribute: .Width, relatedBy: .Equal, toItem: imageView, attribute: .Height, multiplier: 3/4, constant: 0)
+        UIViewController.addActiveConstraint(item: imageView, attribute: .top, relatedBy: .equal, toItem: superview, attribute: .top, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: imageView, attribute: .trailing, relatedBy: .equal, toItem: superview, attribute: .trailing, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: imageView, attribute: .bottom, relatedBy: .equal, toItem: superview, attribute: .bottom, multiplier: 1, constant: 0, priority: 750)
+        UIViewController.addActiveConstraint(item: imageView, attribute: .leading, relatedBy: .equal, toItem: superview, attribute: .leading, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: imageView, attribute: .width, relatedBy: .equal, toItem: imageView, attribute: .height, multiplier: 3/4, constant: 0)
         
         // TODO: Allow for smaller height, focus on `CenterX`. Also check in other view controllers.
         
         // Loading indicator view
         loadingIndicatorView.translatesAutoresizingMaskIntoConstraints = false
-        UIViewController.addActiveConstraint(item: loadingIndicatorView, attribute: .CenterX, relatedBy: .Equal, toItem: imageView, attribute: .CenterX, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: loadingIndicatorView, attribute: .CenterY, relatedBy: .Equal, toItem: imageView, attribute: .CenterY, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: loadingIndicatorView, attribute: .centerX, relatedBy: .equal, toItem: imageView, attribute: .centerX, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: loadingIndicatorView, attribute: .centerY, relatedBy: .equal, toItem: imageView, attribute: .centerY, multiplier: 1, constant: 0)
     }
     
 }

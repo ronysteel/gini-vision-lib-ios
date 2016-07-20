@@ -19,7 +19,7 @@ class ComponentAPIAnalysisViewController: UIViewController {
     @IBOutlet var errorButton: UIButton!
     
     // Input
-    var imageData: NSData!
+    var imageData: Data!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -34,7 +34,7 @@ class ComponentAPIAnalysisViewController: UIViewController {
         displayContent(contentController)
     }
     
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
         // Starts loading animation
@@ -44,12 +44,12 @@ class ComponentAPIAnalysisViewController: UIViewController {
     }
     
     // Pops back to the review view controller
-    @IBAction func back(sender: AnyObject) {
-        navigationController?.popViewControllerAnimated(true)
+    @IBAction func back(_ sender: AnyObject) {
+        _ = navigationController?.popViewController(animated: true)
     }
     
     // Handle tap on error button
-    @IBAction func errorButtonTapped(sender: AnyObject) {
+    @IBAction func errorButtonTapped(_ sender: AnyObject) {
         (contentController as? GINIAnalysisViewController)?.showAnimation()
         hideErrorButton()
         displayError()
@@ -68,7 +68,7 @@ class ComponentAPIAnalysisViewController: UIViewController {
         guard errorButton.alpha != 1.0 else {
             return
         }
-        UIView.animateWithDuration(0.5) {
+        UIView.animate(withDuration: 0.5) {
             self.errorButton.alpha = 1.0
         }
     }
@@ -77,27 +77,23 @@ class ComponentAPIAnalysisViewController: UIViewController {
         guard errorButton.alpha != 0.0 else {
             return
         }
-        UIView.animateWithDuration(0.5) { 
+        UIView.animate(withDuration: 0.5) { 
             self.errorButton.alpha = 0.0
         }
     }
     
     // Displays the content controller inside the container view
-    func displayContent(controller: UIViewController) {
+    func displayContent(_ controller: UIViewController) {
         self.addChildViewController(controller)
         controller.view.frame = self.containerView.bounds
         self.containerView.addSubview(controller.view)
-        controller.didMoveToParentViewController(self)
+        controller.didMove(toParentViewController: self)
     }
     
     // Little delay helper by @matt
-    func delay(delay:Double, closure:()->()) {
-        dispatch_after(
-            dispatch_time(
-                DISPATCH_TIME_NOW,
-                Int64(delay * Double(NSEC_PER_SEC))
-            ),
-            dispatch_get_main_queue(), closure)
+    func delay(_ delay:Double, closure:()->()) {
+        DispatchQueue.main.after(
+            when: DispatchTime.now() + Double(Int64(delay * Double(NSEC_PER_SEC))) / Double(NSEC_PER_SEC), execute: closure)
     }
 
 }

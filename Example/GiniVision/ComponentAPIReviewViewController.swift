@@ -16,7 +16,7 @@ class ComponentAPIReviewViewController: UIViewController {
     var contentController = UIViewController()
     
     // Input
-    var imageData: NSData!
+    var imageData: Data!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,11 +36,11 @@ class ComponentAPIReviewViewController: UIViewController {
     }
     
     // Pops back to the camera view controller
-    @IBAction func back(sender: AnyObject) {
-        navigationController?.popViewControllerAnimated(true)
+    @IBAction func back(_ sender: AnyObject) {
+        _ = navigationController?.popViewController(animated: true)
     }
     
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: AnyObject?) {
         if segue.identifier == "giniShowAnalysis" {
             if let vc = segue.destinationViewController as? ComponentAPIAnalysisViewController {
                 // Set image data as input for the analysis view controller
@@ -50,11 +50,11 @@ class ComponentAPIReviewViewController: UIViewController {
     }
     
     // Displays the content controller inside the container view
-    func displayContent(controller: UIViewController) {
+    func displayContent(_ controller: UIViewController) {
         self.addChildViewController(controller)
         controller.view.frame = self.containerView.bounds
         self.containerView.addSubview(controller.view)
-        controller.didMoveToParentViewController(self)
+        controller.didMove(toParentViewController: self)
     }
     
 }

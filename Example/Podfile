@@ -6,7 +6,8 @@ target 'GiniVision_Example' do
   target 'GiniVision_Tests' do
     inherit! :search_paths
 
-    pod 'Quick', '~> 0.9'
-    pod 'Nimble', '~> 3.0'
+# TODO: Uncommented becuse no support for Swift 3 yet!
+#    pod 'Quick', '~> 0.9'
+#    pod 'Nimble', '~> 3.0'
   end
 end

@@ -27,9 +27,9 @@ internal class GINIReviewContainerViewController: UIViewController, GINIContaine
     }
     
     // Output
-    private var imageData: NSData?
+    private var imageData: Data?
     
-    init(imageData: NSData) {
+    init(imageData: Data) {
         super.init(nibName: nil, bundle: nil)
         
         self.imageData = imageData
@@ -52,7 +52,7 @@ internal class GINIReviewContainerViewController: UIViewController, GINIContaine
         backButton = GINIBarButtonItem(
             image: backButtonImage,
             title: GINIConfiguration.sharedConfiguration.navigationBarReviewTitleBackButton,
-            style: .Plain,
+            style: .plain,
             target: self,
             action: #selector(back)
         )
@@ -61,15 +61,15 @@ internal class GINIReviewContainerViewController: UIViewController, GINIContaine
         continueButton = GINIBarButtonItem(
             image: continueButtonImage,
             title: GINIConfiguration.sharedConfiguration.navigationBarReviewTitleContinueButton,
-            style: .Plain,
+            style: .plain,
             target: self,
             action: #selector(analyse)
         )
         
         // Configure view hierachy
         view.addSubview(containerView)
-        navigationItem.setLeftBarButtonItem(backButton, animated: false)
-        navigationItem.setRightBarButtonItem(continueButton, animated: false)
+        navigationItem.setLeftBarButton(backButton, animated: false)
+        navigationItem.setRightBarButton(continueButton, animated: false)
         
         // Add constraints
         addConstraints()
@@ -89,7 +89,7 @@ internal class GINIReviewContainerViewController: UIViewController, GINIContaine
     @IBAction func back() {
         let delegate = (navigationController as? GININavigationViewController)?.giniDelegate
         delegate?.didCancelReview?()
-        navigationController?.popViewControllerAnimated(true)
+        _ = navigationController?.popViewController(animated: true)
     }
     
     @IBAction func analyse() {
@@ -107,10 +107,10 @@ internal class GINIReviewContainerViewController: UIViewController, GINIContaine
         
         // Container view
         containerView.translatesAutoresizingMaskIntoConstraints = false
-        UIViewController.addActiveConstraint(item: containerView, attribute: .Top, relatedBy: .Equal, toItem: superview, attribute: .Top, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: containerView, attribute: .Trailing, relatedBy: .Equal, toItem: superview, attribute: .Trailing, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: containerView, attribute: .Bottom, relatedBy: .Equal, toItem: superview, attribute: .Bottom, multiplier: 1, constant: 0)
-        UIViewController.addActiveConstraint(item: containerView, attribute: .Leading, relatedBy: .Equal, toItem: superview, attribute: .Leading, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: containerView, attribute: .top, relatedBy: .equal, toItem: superview, attribute: .top, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: containerView, attribute: .trailing, relatedBy: .equal, toItem: superview, attribute: .trailing, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: containerView, attribute: .bottom, relatedBy: .equal, toItem: superview, attribute: .bottom, multiplier: 1, constant: 0)
+        UIViewController.addActiveConstraint(item: containerView, attribute: .leading, relatedBy: .equal, toItem: superview, attribute: .leading, multiplier: 1, constant: 0)
     }
     
 }
